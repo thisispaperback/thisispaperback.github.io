@@ -1,6 +1,5 @@
 import shutil
 from pathlib import Path
-
 from jinja2 import Environment, FileSystemLoader
 from markdown import markdown
 
@@ -28,29 +27,26 @@ def main():
     images_dir = content_dir.joinpath("images")
 
     env = Environment(loader=FileSystemLoader(templates_dir))
-    page_template = env.get_template("page.html")
-    index_template = env.get_template("index.html")
 
     # copy over css files
     shutil.copytree(css_dir, static_dir, dirs_exist_ok=True)
     # copy over images
     shutil.copytree(images_dir, static_dir.joinpath("images"), dirs_exist_ok=True)
 
-    # convert markdown pages into html
-    for page in pages_dir.iterdir():
-        if not page.is_file():
-            continue
+    # make about.html
+    about_template = env.get_template("about.html")
+    with open(pages_dir.joinpath("about.md"), "r") as f:
+        content = markdown(f.read())
+        about_html = about_template.render(
+            site_title="paperback",
+            site_desc=SITE_DESCRIPTION,
+            content=content,
+        )
+        with open(output_dir.joinpath("about.html"), "w") as f_out:
+            f_out.write(about_html)
 
-        with open(page, "r") as f:
-            content = markdown(f.read())
-            page_html = page_template.render(
-                site_title="paperback",
-                site_desc=SITE_DESCRIPTION,
-                content=content,
-            )
-            with open(output_dir.joinpath(page.stem + ".html"), "w") as f_out:
-                f_out.write(page_html)
-
+    # make index.html
+    index_template = env.get_template("index.html")
     index_html = index_template.render(
         site_title=SITE_TITLE, site_desc=SITE_DESCRIPTION
     )
