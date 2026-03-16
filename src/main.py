@@ -38,12 +38,24 @@ def main():
     with open(pages_dir.joinpath("about.md"), "r") as f:
         content = markdown(f.read())
         about_html = about_template.render(
-            site_title="paperback",
+            site_title=SITE_TITLE,
             site_desc=SITE_DESCRIPTION,
             content=content,
         )
         with open(output_dir.joinpath("about.html"), "w") as f_out:
             f_out.write(about_html)
+
+    # make mailing_list.html
+    mailing_list_template = env.get_template("mailing_list.html")
+    with open(pages_dir.joinpath("mailing_list.md"), "r") as f:
+        content = markdown(f.read())
+        mailing_list_html = mailing_list_template.render(
+            site_title=SITE_TITLE,
+            site_desc=SITE_DESCRIPTION,
+            content=content,
+        )
+        with open(output_dir.joinpath("mailing_list.html"), "w") as f_out:
+            f_out.write(mailing_list_html)
 
     # make index.html
     index_template = env.get_template("index.html")
